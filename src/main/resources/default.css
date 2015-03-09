@@ -1,0 +1,11 @@
+
+#messages
+{
+	-fx-font-size:10pt;
+	-fx-font-family:monospace;
+}
+
+.list-cell:selected
+{
+	-fx-background-color:#eee;
+}
