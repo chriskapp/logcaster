@@ -28,7 +28,8 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 
-import com.google.gson.Gson;
+import org.apache.log4j.Logger;
+
 import com.k42b3.logcaster.controller.Overview;
 
 /**
@@ -40,7 +41,8 @@ import com.k42b3.logcaster.controller.Overview;
  */
 public class HandlerImpl implements Handler
 {
-	protected Gson parser = new Gson();
+	protected Logger logger = Logger.getLogger("com.k42b3.logcaster");
+
 	protected Overview controller;
 
 	public HandlerImpl(Overview controller)
@@ -49,58 +51,28 @@ public class HandlerImpl implements Handler
 	}
 
 	@Override
-	public void onStart()
+	public void onReceive(Message message)
 	{
-		this.addMessage("Server started", 0);
-	}
-
-	@Override
-	public void onSend(Frame frame, int connectionId)
-	{
-		Message message = this.parser.fromJson(frame.getBody(), Message.class);
-
-		if(message.getTitle() != null && !message.getTitle().isEmpty())
+		Color color;
+		if(message.getColor() != null && !message.getColor().isEmpty())
 		{
-			this.addMessage(message.getTitle(), connectionId, Color.BLACK, true);
+			color = Color.web(message.getColor());
+		}
+		else
+		{
+			color = Color.BLACK;
 		}
 
-		if(message.getMessage() != null && !message.getMessage().isEmpty())
-		{
-			this.addMessage(message.getMessage(), connectionId, message.isSuccess() ? Color.BLUE : Color.RED, false);
-		}
-
-		if(message.getTrace() != null && !message.getTrace().isEmpty())
-		{
-			this.addMessage(message.getTrace(), connectionId);
-		}
-
-		if(message.getContext() != null && !message.getContext().isEmpty())
-		{
-			this.addMessage(message.getContext(), connectionId);
-		}
+		this.addMessage(message.getMessage(), color, message.isBold());
 	}
 
-	@Override
-	public void onDisconnect(Frame frame, int connectionId)
-	{
-		this.addMessage("Client disconnected", connectionId);
-	}
-
-	@Override
-	public void onConnect(Frame frame, int connectionId, String clientIp)
-	{
-		this.addMessage("Client " + clientIp + " connected", connectionId);
-	}
-
-	protected void addMessage(String message, int connectionId)
-	{
-		addMessage(message, connectionId, Color.BLACK, false);
-	}
-
-	protected void addMessage(String message, int connectionId, Paint color, boolean bold)
+	protected void addMessage(String message, Paint color, boolean bold)
 	{
 		LocalTime time = LocalTime.now();
-		final String prefix = fillZero(connectionId) + "-[" + fillZero(time.getHour()) + ":" + fillZero(time.getMinute()) + ":" + fillZero(time.getSecond()) + "] ";
+		final String prefix = "[" + 
+			fillZero(time.getHour(), 2) + ":" + 
+			fillZero(time.getMinute(), 2) + ":" + 
+			fillZero(time.getSecond(), 2) + "] ";
 
 		Platform.runLater(new Runnable(){
 
@@ -120,9 +92,9 @@ public class HandlerImpl implements Handler
 
 		});
 	}
-	
-	protected String fillZero(int i)
+
+	protected String fillZero(int i, int len)
 	{
-		return i < 10 ? "0" + i : "" + i;
+		return String.format("%0" + len + "d", i);
 	}
 }

@@ -29,8 +29,5 @@ package com.k42b3.logcaster;
  */
 public interface Handler
 {
-	public void onStart();
-	public void onConnect(Frame frame, int connectionId, String clientIp);
-	public void onDisconnect(Frame frame, int connectionId);
-	public void onSend(Frame frame, int connectionId);
+	public void onReceive(Message message);
 }

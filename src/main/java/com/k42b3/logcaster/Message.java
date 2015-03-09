@@ -29,30 +29,45 @@ package com.k42b3.logcaster;
  */
 public class Message
 {
-	protected boolean success;
-	protected String title;
+	protected String color;
+	protected boolean bold;
 	protected String message;
-	protected String trace;
-	protected String context;
+	
+	public Message(String message, String color, boolean bold)
+	{
+		this.message = message;
+		this.color = color;
+		this.bold = bold;
+	}
 
-	public boolean isSuccess()
+	public Message(String message, String color)
 	{
-		return success;
+		this(message, color, false);
+	}
+
+	public Message(String message)
+	{
+		this(message, "#000");
+	}
+
+	public String getColor()
+	{
+		return color;
 	}
 	
-	public void setSuccess(boolean success)
+	public void setColor(String color)
 	{
-		this.success = success;
+		this.color = color;
 	}
 	
-	public String getTitle()
+	public boolean isBold()
 	{
-		return title;
+		return bold;
 	}
 	
-	public void setTitle(String title)
+	public void setBold(boolean bold)
 	{
-		this.title = title;
+		this.bold = bold;
 	}
 	
 	public String getMessage()
@@ -63,25 +78,5 @@ public class Message
 	public void setMessage(String message)
 	{
 		this.message = message;
-	}
-	
-	public String getTrace()
-	{
-		return trace;
-	}
-	
-	public void setTrace(String trace)
-	{
-		this.trace = trace;
-	}
-	
-	public String getContext()
-	{
-		return context;
-	}
-	
-	public void setContext(String context)
-	{
-		this.context = context;
 	}
 }

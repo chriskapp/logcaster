@@ -21,19 +21,13 @@
 package com.k42b3.logcaster;
 
 import java.io.IOException;
-import java.time.LocalTime;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.FontSmoothingType;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -41,8 +35,8 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.mina.core.service.IoAcceptor;
 
-import com.google.gson.Gson;
 import com.k42b3.logcaster.controller.Overview;
 
 /**
@@ -57,12 +51,12 @@ public class Entry extends Application
 	protected Logger logger = Logger.getLogger("com.k42b3.logcaster");
 
 	private Scene scene;
-	private Server server;
+	private IoAcceptor server;
 	
 	@Override
     public void start(Stage primaryStage) throws IOException
 	{
-		Logger.getRootLogger().setLevel(Level.INFO);
+		Logger.getLogger("com.k42b3.logcaster").setLevel(Level.INFO);
 		Logger.getLogger("com.k42b3.logcaster").addAppender(new ConsoleAppender(new PatternLayout()));
 
 		FXMLLoader loader = new FXMLLoader();
@@ -80,7 +74,7 @@ public class Entry extends Application
 			{
 				if(server != null)
 				{
-					server.close();
+					server.dispose();
 				}
 			}
 
@@ -93,8 +87,18 @@ public class Entry extends Application
 			@Override
 			protected Void call()
 			{
-		        server = new Server(61613, new HandlerImpl(controller));
-		        server.run();
+				try
+				{
+					HandlerImpl handler = new HandlerImpl(controller);
+			        server = Server.start(61613, handler);
+
+			        // welcome message
+					handler.onReceive(new Message("LogCaster v" + LogCaster.VERSION + " started", "#060"));
+				}
+				catch(IOException e)
+				{
+					logger.error(e.getMessage(), e);
+				}
 
 		        return null;
 			}

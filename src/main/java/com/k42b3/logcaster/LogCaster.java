@@ -29,5 +29,5 @@ package com.k42b3.logcaster;
  */
 public class LogCaster
 {
-	public static final String VERSION = "0.0.1";
+	public static final String VERSION = "0.0.2";
 }
